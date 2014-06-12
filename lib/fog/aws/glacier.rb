@@ -155,6 +155,11 @@ module Fog
           params[:headers]['x-amz-security-token'] = @aws_session_token if @aws_session_token
           params[:headers]['Authorization'] = @signer.sign params, date
 
+          debug_params = params.dup
+          body = debug_params.delete :body
+          $stderr.puts "GLACIER REQUEST: #{debug_params}"
+          $stderr.puts "GLACIER REQUEST BODY (#{body.length}): #{body[0..128]}"
+
           response = @connection.request(params, &block)
           if response.headers['Content-Type'] == 'application/json' && response.body.size > 0 #body will be empty if the streaming form has been used
             response.body  = Fog::JSON.decode(response.body)
